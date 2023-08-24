@@ -117,7 +117,9 @@ $generateButton.Add_Click({
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
             $departureTime = Get-Date "1970-01-01 00:00:00Z"
-            Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
+            
+            #Zum debuggen
+            #Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
 
             $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(1)
 
