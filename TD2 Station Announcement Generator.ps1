@@ -29,19 +29,6 @@ $mainForm.Width = 750
 $mainForm.Height = 600
 $mainForm.Font = $newFont
 
-$categoriesLabel = New-Object System.Windows.Forms.Label
-$categoriesLabel.Text = "Train Type:"
-$categoriesLabel.Location = New-Object System.Drawing.Point(10, 20)
-$categoriesLabel.AutoSize = $true
-$mainForm.Controls.Add($categoriesLabel)
-
-$categoriesDropdown = New-Object System.Windows.Forms.ComboBox
-$categoriesDropdown.Location = New-Object System.Drawing.Point(10, 80)
-$categoriesDropdown.Width = 400
-$categories = @('APM','EIE','EIJ','EIS','MPJ','MPE','MPS','RPE','RPJ','RPS','ROE','ROJ','ROS','RPM')
-$categoriesDropdown.Items.AddRange($categories)
-$mainForm.Controls.Add($categoriesDropdown)
-
 $trackLabel = New-Object System.Windows.Forms.Label
 $trackLabel.Text = "Track:"
 $trackLabel.Location = New-Object System.Drawing.Point(10, 140)
@@ -68,59 +55,98 @@ $passingThroughCheckBox.Width = 300
 $passingThroughCheckBox.height = 40
 $mainForm.Controls.Add($passingThroughCheckBox)
 
-$startLabel = New-Object System.Windows.Forms.Label
-$startLabel.Text = "Start:"
-$startLabel.Location = New-Object System.Drawing.Point(10, 350)
-$startLabel.AutoSize = $true
-$mainForm.Controls.Add($startLabel)
+$trainLabel = New-Object System.Windows.Forms.Label
+$trainLabel.Text = "Train:"
+$trainLabel.Location = New-Object System.Drawing.Point(10, 350)
+$trainLabel.AutoSize = $true
+$mainForm.Controls.Add($trainLabel)
 
-$startTextbox = New-Object System.Windows.Forms.TextBox
-$startTextbox.Location = New-Object System.Drawing.Point(10, 400)
-$startTextbox.Width = 400
-$mainForm.Controls.Add($startTextbox)
+# Dropdown für die Zugauswahl
+$trainDropdown = New-Object System.Windows.Forms.ComboBox
+$trainDropdown.Location = New-Object System.Drawing.Point(10, 400)
+$trainDropdown.Width = 400
+$mainForm.Controls.Add($trainDropdown)
 
-$destinationLabel = New-Object System.Windows.Forms.Label
-$destinationLabel.Text = "Destination:"
-$destinationLabel.Location = New-Object System.Drawing.Point(10, 450)
-$destinationLabel.AutoSize = $true
-$mainForm.Controls.Add($destinationLabel)
+# Neues Label für die Bahnhofsauswahl
+$stationLabel = New-Object System.Windows.Forms.Label
+$stationLabel.Text = "Station:"
+$stationLabel.Location = New-Object System.Drawing.Point(10, 20)
+$stationLabel.AutoSize = $true
+$mainForm.Controls.Add($stationLabel)
 
-$destinationTextbox = New-Object System.Windows.Forms.TextBox
-$destinationTextbox.Location = New-Object System.Drawing.Point(10, 500)
-$destinationTextbox.Width = 400
-$mainForm.Controls.Add($destinationTextbox)
+# Dropdown für die Bahnhofsauswahl
+$stationDropdown = New-Object System.Windows.Forms.ComboBox
+$stationDropdown.Location = New-Object System.Drawing.Point(10, 80)
+$stationDropdown.Width = 400
+$mainForm.Controls.Add($stationDropdown)
 
-$timeLabel = New-Object System.Windows.Forms.Label
-$timeLabel.Text = "Departure:"
-$timeLabel.Location = New-Object System.Drawing.Point(450, 20)
-$timeLabel.AutoSize = $true
-$mainForm.Controls.Add($timeLabel)
+$response = Invoke-RestMethod -Uri "https://spythere.pl/api/getSceneries"
+$stationNames = $response | ForEach-Object { $_.Name } | Sort-Object
+$stationDropdown.Items.AddRange($stationNames)
 
-$timeTextbox = New-Object System.Windows.Forms.TextBox
-$timeTextbox.Location = New-Object System.Drawing.Point(450, 80)
-$timeTextbox.Width = 200
-$mainForm.Controls.Add($timeTextbox)
+# Button zum Aktualisieren der Stationen und Züge
+$updateButton = New-Object System.Windows.Forms.Button
+$updateButton.Text = "Update Trains"
+$updateButton.Location = New-Object System.Drawing.Point(450, 320)
+$updateButton.Width = 250
+$updateButton.Height = 60
+$updateButton.Add_Click({
+    # Aktualisieren der Stationsliste
+    $response = Invoke-RestMethod -Uri "https://spythere.pl/api/getSceneries"
+    $stationNames = $response | ForEach-Object { $_.Name } | Sort-Object
+    $selectedStation = $stationDropdown.SelectedItem
+    $stationDropdown.Items.Clear()
+    $stationDropdown.Items.AddRange($stationNames)
+    if ($stationNames -contains $selectedStation) {
+        $stationDropdown.SelectedItem = $selectedStation
+    }
+
+    # Aktualisieren der Zugliste, wenn eine Station ausgewählt wurde
+    if ($stationDropdown.SelectedItem) {
+        $selectedStationName = $stationDropdown.SelectedItem
+        $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
+        $relevantTrains = $trainsResponse | Where-Object { $_.currentStationName -eq $selectedStationName }
+        $trainNumbers = $relevantTrains | ForEach-Object { $_.trainNo }
+        $trainDropdown.Items.Clear()
+        $trainDropdown.Items.AddRange($trainNumbers)
+    }
+})
+$mainForm.Controls.Add($updateButton)
 
 $generateButton = New-Object System.Windows.Forms.Button
 $generateButton.Text = "Generate"
-$generateButton.Location = New-Object System.Drawing.Point(450, 220)
+$generateButton.Location = New-Object System.Drawing.Point(450, 390)
 $generateButton.Width = 250
 $generateButton.Height = 60
 $generateButton.Add_Click({
-    if ($checkBox.Checked) {
-        $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$categoriesDropdown.SelectedItem]) from $($startTextbox.Text) is arriving. This train ends here, please do not board."
-        $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$categoriesDropdown.SelectedItem]) ze stacji $($startTextbox.Text). Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu"
-    } elseif ($passingThroughCheckBox.Checked) {
-        $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), A train is passing through. Please stand back."
-        $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Na tor $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
-    } else {
-        $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$categoriesDropdown.SelectedItem]) from $($startTextbox.Text) to $($destinationTextbox.Text) is arriving. The planned Departure is $($timeTextbox.Text)."
-        $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$categoriesDropdown.SelectedItem]) ze stacji $($startTextbox.Text) do stacji $($destinationTextbox.Text) wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($timeTextbox.Text)."
-    }
-    $combinedAnnouncement = "$announcementEN`r`n$announcementPL"
-    $combinedAnnouncement | Set-Clipboard
-    [System.Windows.Forms.MessageBox]::Show("Announcement copied to clipboard!")
-})
+    if ($stationDropdown.SelectedItem -and $trainDropdown.SelectedItem) {
+        $selectedStationName = $stationDropdown.SelectedItem
+        $selectedTrainNo = $trainDropdown.SelectedItem
 
+        $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
+        $selectedTrain = $trainsResponse | Where-Object { $_.trainNo -eq $selectedTrainNo }
+        $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -eq $selectedStationName })
+
+        if ($stopDetails.stopType -like "*ph*") {
+            $departureTime = Get-Date "1970-01-01 00:00:00Z"
+            Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
+
+            $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(1)
+
+             $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
+             $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
+
+            # Erstellen Sie die Ankündigung mit den extrahierten Daten
+            $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The Train from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
+
+        } else {
+            $announcement = "Dieser Zug fährt nur durch die Station $selectedStationName."
+        }
+        [System.Windows.Forms.MessageBox]::Show($announcement)
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("Bitte wählen Sie sowohl eine Station als auch einen Zug aus.")
+    }
+
+})
 $mainForm.Controls.Add($generateButton)
 $mainForm.ShowDialog()
