@@ -77,6 +77,7 @@ $updateButton.Location = New-Object System.Drawing.Point(450, 320)
 $updateButton.Width = 250
 $updateButton.Height = 60
 $updateButton.Add_Click({
+
     # Aktualisieren der Stationsliste
     $response = Invoke-RestMethod -Uri "https://spythere.pl/api/getSceneries"
     $stationNames = $response | ForEach-Object { $_.Name } | Sort-Object
@@ -127,7 +128,7 @@ $generateButton.Add_Click({
             $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
             $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
 
-            # Erstellen Sie die Ankündigung mit den extrahierten Daten
+            
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
             $combinedAnnouncement = "$announcementEN $announcementPL"
@@ -137,7 +138,7 @@ $generateButton.Add_Click({
         } 
         if ($stopDetails.terminatesHere -eq $true) {
 
-            # Erstellen Sie die Ankündigung mit den extrahierten Daten
+           
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$selectedTrain.timetable.category]) from $startStation is arriving. This train ends here, please do not board the train."
             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu"
 
