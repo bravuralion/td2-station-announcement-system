@@ -5,7 +5,7 @@ $fontFactor = 2
 $defaultFont = [System.Windows.Forms.Control]::DefaultFont
 $newFont = New-Object System.Drawing.Font($defaultFont.FontFamily, ($defaultFont.Size * $fontFactor))
 
-# Hashtable for the categories
+# Hashtable
 $categoriesNames = @{
     'APM' = 'osobowy';
     'EIE' = 'express';
@@ -48,21 +48,18 @@ $trainLabel.Location = New-Object System.Drawing.Point(10, 240)
 $trainLabel.AutoSize = $true
 $mainForm.Controls.Add($trainLabel)
 
-# Dropdown für die Zugauswahl
 $trainDropdown = New-Object System.Windows.Forms.ComboBox
 $trainDropdown.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
 $trainDropdown.Location = New-Object System.Drawing.Point(10, 300)
 $trainDropdown.Width = 400
 $mainForm.Controls.Add($trainDropdown)
 
-# Neues Label für die Bahnhofsauswahl
 $stationLabel = New-Object System.Windows.Forms.Label
 $stationLabel.Text = "Station:"
 $stationLabel.Location = New-Object System.Drawing.Point(10, 20)
 $stationLabel.AutoSize = $true
 $mainForm.Controls.Add($stationLabel)
 
-# Dropdown für die Bahnhofsauswahl
 $stationDropdown = New-Object System.Windows.Forms.ComboBox
 $stationDropdown.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
 $stationDropdown.Location = New-Object System.Drawing.Point(10, 80)
@@ -73,7 +70,7 @@ $response = Invoke-RestMethod -Uri "https://spythere.pl/api/getSceneries"
 $stationNames = $response | ForEach-Object { $_.Name } | Sort-Object
 $stationDropdown.Items.AddRange($stationNames)
 
-# Button zum Aktualisieren der Stationen und Züge
+# Button zum Aktualisieren der Züge
 $updateButton = New-Object System.Windows.Forms.Button
 $updateButton.Text = "Update Trains"
 $updateButton.Location = New-Object System.Drawing.Point(450, 320)
