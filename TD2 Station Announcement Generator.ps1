@@ -114,12 +114,15 @@ $generateButton.Add_Click({
         $selectedTrain = $trainsResponse | Where-Object { $_.trainNo -eq $selectedTrainNo }
         $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" })
         write-host $stopDetails
+        write-host $stopDetails.stopType
+        write-host $stopDetails.terminatesHere
+        Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
             $departureTime = Get-Date "1970-01-01 00:00:00Z"
             
             #Zum debuggen
-            #Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
+            
 
             $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(1)
 
@@ -131,6 +134,8 @@ $generateButton.Add_Click({
             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
             $combinedAnnouncement = "$announcementEN $announcementPL"
             $combinedAnnouncement | Set-Clipboard
+            [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
+            return
         } 
         if ($stopDetails.terminatesHere -eq $true) {
 
