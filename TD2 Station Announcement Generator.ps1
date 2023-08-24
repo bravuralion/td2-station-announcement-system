@@ -112,22 +112,20 @@ $generateButton.Add_Click({
 
         $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
         $selectedTrain = $trainsResponse | Where-Object { $_.trainNo -eq $selectedTrainNo }
-        $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" })
-        write-host $stopDetails
-        write-host $stopDetails.stopType
-        write-host $stopDetails.terminatesHere
-        Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
+        $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" -and $_.mainStop -eq $True })
+
+        #For Debugging
+        #write-host $stopDetails
+        #write-host $stopDetails.stopType
+        #write-host $stopDetails.terminatesHere
+        #Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
             $departureTime = Get-Date "1970-01-01 00:00:00Z"
-            
-            #Zum debuggen
-            
-
             $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(1)
 
-             $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
-             $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
+            $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
+            $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
 
             # Erstellen Sie die Ankündigung mit den extrahierten Daten
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
@@ -138,9 +136,6 @@ $generateButton.Add_Click({
             return
         } 
         if ($stopDetails.terminatesHere -eq $true) {
-
-            $departureTime = Get-Date "1970-01-01 00:00:00Z"     
-            $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
 
             # Erstellen Sie die Ankündigung mit den extrahierten Daten
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$selectedTrain.timetable.category]) from $startStation is arriving. This train ends here, please do not board the train."
