@@ -140,14 +140,16 @@ $generateButton.Add_Click({
         $selectedTrain = $trainsResponse | Where-Object { $_.trainNo -eq $selectedTrainNo }
         $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" -and $_.mainStop -eq $True })
         if ($stopDetails -eq $null) {
-            $mainStationName = ($selectedStationName -split ' ')[-1]
+            $mainStationName = ($selectedStationName -split ' ')
             $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName" -and $_.mainStop -eq $True })
         }
         if ($stopDetails -eq $null) {
-            $mainStationName = ($selectedStationName -split ' ')[-1]
+            $mainStationName = ($selectedStationName -split ' ')
             $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName*" -and $_.mainStop -eq $True })
         }
-
+        $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
+        $stopDetails.terminatesHere
+        $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
 
@@ -157,8 +159,7 @@ $generateButton.Add_Click({
             $arrivalTime = Get-Date "1970-01-01 00:00:00Z"
             $arrivalTime = $arrivalTime.AddSeconds($stopDetails.arrivalTimestamp / 1000).AddHours(1)
 
-            $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
-            $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
+            
             if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 5) {
 
                 $delayMinutes = $stopDetails.departureDelay
