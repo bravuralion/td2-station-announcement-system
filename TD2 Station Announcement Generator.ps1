@@ -139,8 +139,14 @@ $generateButton.Add_Click({
         $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
         $selectedTrain = $trainsResponse | Where-Object { $_.trainNo -eq $selectedTrainNo }
         $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" -and $_.mainStop -eq $True })
-
+        $stopDetails2 = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" -and $_.mainStop -eq $True })
+        if ($stopDetails -eq $null) {
+            $mainStationName = ($selectedStationName -split ' ')[-1]
+            $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName" -and $_.mainStop -eq $True })
+        }
         #For Debugging
+        write-host $selectedTrain.timetable.stoplist.stopNameRAW
+        write-host $selectedStationName
         write-host $stopDetails
         write-host $stopDetails.stopType
         write-host $stopDetails.terminatesHere
@@ -156,7 +162,7 @@ $generateButton.Add_Click({
 
             $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
             $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
-            if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 5) {
+            if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 2) {
 
                 $delayMinutes = $stopDetails.departureDelay
                 $announcementEN = "*STATION ANNOUNCEMENT* The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $stopDetails.departureDelay minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
