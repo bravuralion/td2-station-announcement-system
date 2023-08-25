@@ -70,9 +70,45 @@ $response = Invoke-RestMethod -Uri "https://spythere.pl/api/getSceneries"
 $stationNames = $response | ForEach-Object { $_.Name } | Sort-Object
 $stationDropdown.Items.AddRange($stationNames)
 
+# Checkbox für Auto-Update
+$autoUpdateCheckbox = New-Object System.Windows.Forms.CheckBox
+$autoUpdateCheckbox.Text = "Auto Update"
+$autoUpdateCheckbox.Location = New-Object System.Drawing.Point(450, 280)
+$autoUpdateCheckbox.AutoSize = $true
+$mainForm.Controls.Add($autoUpdateCheckbox)
+
+# Checkbox für Verspätungen
+$delayCheckbox = New-Object System.Windows.Forms.CheckBox
+$delayCheckbox.Text = "Delays"
+$delayCheckbox.Location = New-Object System.Drawing.Point(450, 330) 
+$delayCheckbox.AutoSize = $true
+$mainForm.Controls.Add($delayCheckbox)
+
+# Timer für Auto-Update
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = 30000 # 30 Sekunden
+$timer.Add_Tick({
+    if ($autoUpdateCheckbox.Checked) {
+        # Aktualisieren der Zugliste, wenn eine Station ausgewählt wurde
+        if ($stationDropdown.SelectedItem) {
+            $selectedStationName = $stationDropdown.SelectedItem
+            $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
+            $relevantTrains = $trainsResponse | Where-Object { $_.currentStationName -eq $selectedStationName }
+            $trainNumbers = $relevantTrains | ForEach-Object { $_.trainNo }
+            $trainDropdown.Items.Clear()
+            $trainDropdown.SelectedItem = $null
+            if ($trainNumbers.Count -eq 0) {
+                $trainDropdown.Items.Add("Kein Zug aktuell in dieser Station")
+            } else {
+                $trainDropdown.Items.AddRange($trainNumbers)
+            }
+        }
+    }
+})
+
 $updateButton = New-Object System.Windows.Forms.Button
 $updateButton.Text = "Update Trains"
-$updateButton.Location = New-Object System.Drawing.Point(450, 320)
+$updateButton.Location = New-Object System.Drawing.Point(10, 390)
 $updateButton.Width = 250
 $updateButton.Height = 60
 $updateButton.Add_Click({
@@ -105,25 +141,41 @@ $generateButton.Add_Click({
         $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" -and $_.mainStop -eq $True })
 
         #For Debugging
-        #write-host $stopDetails
-        #write-host $stopDetails.stopType
-        #write-host $stopDetails.terminatesHere
-        #Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
+        write-host $stopDetails
+        write-host $stopDetails.stopType
+        write-host $stopDetails.terminatesHere
+        Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
 
             $departureTime = Get-Date "1970-01-01 00:00:00Z"
             $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(1)
 
+            $arrivalTime = Get-Date "1970-01-01 00:00:00Z"
+            $arrivalTime = $arrivalTime.AddSeconds($stopDetails.arrivalTimestamp / 1000).AddHours(1)
+
             $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
             $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
+            if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 5) {
+
+                $delayMinutes = $stopDetails.departureDelay
+                $announcementEN = "*STATION ANNOUNCEMENT* The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $stopDetails.departureDelay minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
+                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $stopDetails.departureDelay minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
+                $combinedAnnouncement = "$announcementEN $announcementPL"
+                $combinedAnnouncement | Set-Clipboard
+                [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
+                return
+            }
+            else {
+
             
-            $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
-            $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
-            $combinedAnnouncement = "$announcementEN $announcementPL"
-            $combinedAnnouncement | Set-Clipboard
-            [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
-            return
+                $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
+                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
+                $combinedAnnouncement = "$announcementEN $announcementPL"
+                $combinedAnnouncement | Set-Clipboard
+                [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
+                return
+            }
         } 
         if ($stopDetails.terminatesHere -eq $true) {
            
@@ -148,5 +200,6 @@ $generateButton.Add_Click({
     }
 
 })
+$timer.Start()
 $mainForm.Controls.Add($generateButton)
 $mainForm.ShowDialog()
