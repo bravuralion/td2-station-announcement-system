@@ -145,12 +145,8 @@ $generateButton.Add_Click({
             $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName" -and $_.mainStop -eq $True })
         }
         #For Debugging
-        write-host $selectedTrain.timetable.stoplist.stopNameRAW
-        write-host $selectedStationName
-        write-host $stopDetails
-        write-host $stopDetails.stopType
-        write-host $stopDetails.terminatesHere
-        Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
+        write-host $stopDetails.departureDelay
+
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
 
@@ -162,11 +158,11 @@ $generateButton.Add_Click({
 
             $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
             $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
-            if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 2) {
+            if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 5) {
 
                 $delayMinutes = $stopDetails.departureDelay
-                $announcementEN = "*STATION ANNOUNCEMENT* The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $stopDetails.departureDelay minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
-                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $stopDetails.departureDelay minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
+                $announcementEN = "*STATION ANNOUNCEMENT* The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $delayMinutes minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
+                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
                 $combinedAnnouncement = "$announcementEN $announcementPL"
                 $combinedAnnouncement | Set-Clipboard
                 [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
