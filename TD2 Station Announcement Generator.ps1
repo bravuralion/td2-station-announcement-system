@@ -143,6 +143,10 @@ $generateButton.Add_Click({
             $mainStationName = ($selectedStationName -split ' ')[-1]
             $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName" -and $_.mainStop -eq $True })
         }
+        if ($stopDetails -eq $null) {
+            $mainStationName = ($selectedStationName -split ' ')[-1]
+            $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName*" -and $_.mainStop -eq $True })
+        }
 
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
