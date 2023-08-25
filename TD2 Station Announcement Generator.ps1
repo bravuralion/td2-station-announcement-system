@@ -70,23 +70,12 @@ $response = Invoke-RestMethod -Uri "https://spythere.pl/api/getSceneries"
 $stationNames = $response | ForEach-Object { $_.Name } | Sort-Object
 $stationDropdown.Items.AddRange($stationNames)
 
-# Button zum Aktualisieren der Züge
 $updateButton = New-Object System.Windows.Forms.Button
 $updateButton.Text = "Update Trains"
 $updateButton.Location = New-Object System.Drawing.Point(450, 320)
 $updateButton.Width = 250
 $updateButton.Height = 60
 $updateButton.Add_Click({
-
-    # Aktualisieren der Stationsliste
-    $response = Invoke-RestMethod -Uri "https://spythere.pl/api/getSceneries"
-    $stationNames = $response | ForEach-Object { $_.Name } | Sort-Object
-    $selectedStation = $stationDropdown.SelectedItem
-    $stationDropdown.Items.Clear()
-    $stationDropdown.Items.AddRange($stationNames)
-    if ($stationNames -contains $selectedStation) {
-        $stationDropdown.SelectedItem = $selectedStation
-    }
 
     # Aktualisieren der Zugliste, wenn eine Station ausgewählt wurde
     if ($stationDropdown.SelectedItem) {
@@ -122,12 +111,12 @@ $generateButton.Add_Click({
         #Write-Host "Timestamp: $($stopDetails.departureTimestamp)"
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
+
             $departureTime = Get-Date "1970-01-01 00:00:00Z"
             $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(1)
 
             $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
             $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
-
             
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
@@ -137,14 +126,15 @@ $generateButton.Add_Click({
             return
         } 
         if ($stopDetails.terminatesHere -eq $true) {
-
            
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$selectedTrain.timetable.category]) from $startStation is arriving. This train ends here, please do not board the train."
             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu"
 
             $combinedAnnouncement = "$announcementEN $announcementPL"
             $combinedAnnouncement | Set-Clipboard
-        }else {
+        }
+        else {
+
              $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), A train is passing through. Please stand back."
              $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Na tor $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
              $combinedAnnouncement = "$announcementEN $announcementPL"
@@ -152,8 +142,9 @@ $generateButton.Add_Click({
         }
 
         [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
-    } else {
-        [System.Windows.Forms.MessageBox]::Show("Bitte wählen Sie sowohl eine Station als auch einen Zug aus.")
+    } 
+    else {
+        [System.Windows.Forms.MessageBox]::Show("Please select both a station and a train.")
     }
 
 })
