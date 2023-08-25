@@ -139,13 +139,10 @@ $generateButton.Add_Click({
         $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
         $selectedTrain = $trainsResponse | Where-Object { $_.trainNo -eq $selectedTrainNo }
         $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" -and $_.mainStop -eq $True })
-        $stopDetails2 = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$selectedStationName" -and $_.mainStop -eq $True })
         if ($stopDetails -eq $null) {
             $mainStationName = ($selectedStationName -split ' ')[-1]
             $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName" -and $_.mainStop -eq $True })
         }
-        #For Debugging
-        write-host $stopDetails.departureDelay
 
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
