@@ -84,6 +84,20 @@ $delayCheckbox.Location = New-Object System.Drawing.Point(450, 330)
 $delayCheckbox.AutoSize = $true
 $mainForm.Controls.Add($delayCheckbox)
 
+$languageSelectionLabel = New-Object System.Windows.Forms.Label
+$languageSelectionLabel.Text = "Language:"
+$languageSelectionLabel.Location = New-Object System.Drawing.Point(450, 20)
+$languageSelectionLabel.AutoSize = $true
+$mainForm.Controls.Add($languageSelectionLabel)
+
+$languageSelection = New-Object System.Windows.Forms.CheckedListBox
+$languageSelection.Items.Add("English", $true)
+$languageSelection.Items.Add("Polish", $true)
+$languageSelection.Location = New-Object System.Drawing.Point(450, 80)
+$languageSelection.Width = 250
+$languageSelection.Height = 80
+$mainForm.Controls.Add($languageSelection)
+
 # Timer für Auto-Update
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 30000 # 30 Sekunden
@@ -148,8 +162,14 @@ $generateButton.Add_Click({
             $stopDetails = ($selectedTrain.timetable.stopList | Where-Object { $_.stopNameRAW -like "*$mainStationName" -and $_.mainStop -eq $True })
         }
 
+        #For Debugging
+        #write-host "Stoplist:"
+        #write-host $selectedTrain.timetable.stopList
+        #write-host "Station Name: $selectedStationName"
+        #write-host "Stop Type:"
+        #write-host $stopDetails.stopType
+
         $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
-        $stopDetails.terminatesHere
         $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
@@ -166,19 +186,13 @@ $generateButton.Add_Click({
                 $delayMinutes = $stopDetails.departureDelay
                 $announcementEN = "*STATION ANNOUNCEMENT* The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $delayMinutes minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
                 $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
-                $combinedAnnouncement = "$announcementEN $announcementPL"
-                $combinedAnnouncement | Set-Clipboard
-                [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
-                return
             }
             else {
 
             
                 $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
                 $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
-                $combinedAnnouncement = "$announcementEN $announcementPL"
-                $combinedAnnouncement | Set-Clipboard
-                [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
+                GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL
                 return
             }
         } 
@@ -187,24 +201,35 @@ $generateButton.Add_Click({
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$selectedTrain.timetable.category]) from $startStation is arriving. This train ends here, please do not board the train."
             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu"
 
-            $combinedAnnouncement = "$announcementEN $announcementPL"
-            $combinedAnnouncement | Set-Clipboard
         }
         else {
 
              $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), A train is passing through. Please stand back."
              $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Na tor $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
-             $combinedAnnouncement = "$announcementEN $announcementPL"
-             $combinedAnnouncement | Set-Clipboard
         }
 
-        [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
+        GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL
     } 
     else {
         [System.Windows.Forms.MessageBox]::Show("Please select all: a station, track and train.")
     }
 
 })
+
+function GenerateAndDisplayAnnouncement {
+    param (
+        [string]$announcementEN,
+        [string]$announcementPL
+    )
+
+    $combinedAnnouncement = ""
+    if ($languageSelection.GetItemChecked(0)) { $combinedAnnouncement += "$announcementEN " }
+    if ($languageSelection.GetItemChecked(1)) { $combinedAnnouncement += "$announcementPL " }
+
+    $combinedAnnouncement | Set-Clipboard
+    [System.Windows.Forms.MessageBox]::Show("The following text has been copied to your clipboard:`n`n$combinedAnnouncement")
+}
+
 $timer.Start()
 $mainForm.Controls.Add($generateButton)
 $mainForm.ShowDialog()
