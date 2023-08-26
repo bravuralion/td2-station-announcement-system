@@ -58,39 +58,6 @@ At this point, I would like to thank the following people who supported me in th
 can Check the generated Announcement.  
   
 Note: The announcements for a PH are generated only for the primary station, not for small stops.  
-  
-**Changelog:**  
-  
-**1.0  
-**
-
--   Initial Release
-
-**1.1  
-**
-
--   Polish translation modified.
--   Tracks now go up to 600
--   Added option for a train passing through
--   The program translates the codes like EIE automatically to Express etc. in the output
-
-  
-**2.0  
-**
-
--   Stations are automatically retrieved from the API
--   Trains are automatically read from the selected station
--   Added option for delays
--   Added option for auto update
--   Adjustments to the UI
--   Removed manual input of stations as no longer necessary.
-
-  
-**2.2  
-**
-
--   The final stop of the train was not properly detected, error was fixed with the kind support of Saix95
-  
 
 **IMPORTANT: It can happen that the Antivirus blocks the Exe as it detects that it runs a Powershell Script. Either whitelist the Exe or you can Download the .ps1 file from Github and run it manually.  [https://github.com/MScholtes/Win-PS2EXE/issues/4](https://github.com/MScholtes/Win-PS2EXE/issues/4)  
 **
