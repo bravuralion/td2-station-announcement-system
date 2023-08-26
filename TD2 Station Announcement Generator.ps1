@@ -44,13 +44,13 @@ $mainForm.Controls.Add($trackDropdown)
 
 $trainLabel = New-Object System.Windows.Forms.Label
 $trainLabel.Text = "Train:"
-$trainLabel.Location = New-Object System.Drawing.Point(10, 240)
+$trainLabel.Location = New-Object System.Drawing.Point(10, 250)
 $trainLabel.AutoSize = $true
 $mainForm.Controls.Add($trainLabel)
 
 $trainDropdown = New-Object System.Windows.Forms.ComboBox
 $trainDropdown.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
-$trainDropdown.Location = New-Object System.Drawing.Point(10, 300)
+$trainDropdown.Location = New-Object System.Drawing.Point(10, 310)
 $trainDropdown.Width = 400
 $mainForm.Controls.Add($trainDropdown)
 
@@ -95,7 +95,7 @@ $languageSelection.Items.Add("English", $true)
 $languageSelection.Items.Add("Polish", $true)
 $languageSelection.Location = New-Object System.Drawing.Point(450, 80)
 $languageSelection.Width = 250
-$languageSelection.Height = 80
+$languageSelection.Height = 150
 $mainForm.Controls.Add($languageSelection)
 
 # Timer für Auto-Update
