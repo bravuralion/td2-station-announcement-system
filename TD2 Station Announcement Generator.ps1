@@ -196,6 +196,7 @@ $generateButton.Add_Click({
                 $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
                 GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL
                 return
+
             }
         } 
         if ($stopDetails.terminatesHere -eq $true) {
