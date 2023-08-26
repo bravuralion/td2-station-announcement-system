@@ -132,7 +132,7 @@ $generateButton.Location = New-Object System.Drawing.Point(450, 390)
 $generateButton.Width = 250
 $generateButton.Height = 60
 $generateButton.Add_Click({
-    if ($stationDropdown.SelectedItem -and $trainDropdown.SelectedItem) {
+    if ($stationDropdown.SelectedItem -and $trainDropdown.SelectedItem -and $trackDropDown.SelectedItem) {
         $selectedStationName = $stationDropdown.SelectedItem
         $selectedTrainNo = $trainDropdown.SelectedItem
 
@@ -200,7 +200,7 @@ $generateButton.Add_Click({
         [System.Windows.Forms.MessageBox]::Show($combinedAnnouncement)
     } 
     else {
-        [System.Windows.Forms.MessageBox]::Show("Please select both a station and a train.")
+        [System.Windows.Forms.MessageBox]::Show("Please select all: a station, track and train.")
     }
 
 })
