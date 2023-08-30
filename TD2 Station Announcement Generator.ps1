@@ -231,8 +231,8 @@ $generateButton.Add_Click({
                 $announcementAEN = "The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $delayMinutes minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
                 $announcementDE = "*Bahnhofsdurchsage* Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation, geplante Ankunft $($arrivalTime.ToString('HH:mm')) , wird voraussichtlich mit einer Verspätung von $delayMinutes Minuten auf Gleis $($trackDropdown.SelectedItem) eintreffen. Bitte beachten Sie die Ansagen."
                 $announcementADE = "Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation, geplante Ankunft $($arrivalTime.ToString('HH:mm')) , wird voraussichtlich mit einer Verspätung von $delayMinutes Minuten auf Gleis $($trackDropdown.SelectedItem) eintreffen. Bitte beachten Sie die Ansagen."
-                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
-                $announcementAPL = "Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
+                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor numer $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
+                $announcementAPL = "Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor numer $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
                 AddToLog "Generating announcement."
                 GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
                 
@@ -244,8 +244,8 @@ $generateButton.Add_Click({
                 $announcementAEN = "Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
                 $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $($trackDropdown.SelectedItem), Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation fährt ein. Die planmässige Abfahrt ist um $($departureTime.ToString('HH:mm'))."
                 $announcementADE = "Achtung am Gleis $($trackDropdown.SelectedItem), Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation fährt ein. Die planmässige Abfahrt ist um $($departureTime.ToString('HH:mm'))."
-                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
-                $announcementAPL = "Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
+                $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor numer $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
+                $announcementAPL = "Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor numer $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
                 AddToLog "Generating announcement."
                 GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
                 
@@ -259,16 +259,16 @@ $generateButton.Add_Click({
             $announcementAEN = "Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$selectedTrain.timetable.category]) from $startStation is arriving. This train ends here, please do not board the train."
             $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $($trackDropdown.SelectedItem), der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation fährt ein. Dieser Zug endet hier, bitte nicht einsteigen."
             $announcementADE = "Achtung am Gleis $($trackDropdown.SelectedItem), der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation fährt ein. Dieser Zug endet hier, bitte nicht einsteigen."
-            $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
-            $announcementAPL = "Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+            $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga na tor numer $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+            $announcementAPL = "Uwaga na tor numer $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
 
         }
         else {
 
              $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), A train is passing through. Please stand back."
              $announcementAEN = "Attention at track $($trackDropdown.SelectedItem), A train is passing through. Please stand back."
-             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Na tor $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
-             $announcementAPL = "Uwaga! Na tor $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Na tor numer $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+             $announcementAPL = "Uwaga! Na tor numer $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
              $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $($trackDropdown.SelectedItem), Zugdurchfahrt. Zurückbleiben bitte."
              $announcementADE = "Achtung am Gleis $($trackDropdown.SelectedItem), Zugdurchfahrt. Zurückbleiben bitte."
              
