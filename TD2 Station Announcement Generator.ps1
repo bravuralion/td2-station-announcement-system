@@ -27,15 +27,12 @@ $categoriesNames = @{
     'ROJ' = 'osobowy';
     'ROS' = 'osobowy';
 }
-$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$iconPath = Join-Path $scriptPath "logo.ico"
 
 $mainForm = New-Object System.Windows.Forms.Form
 $mainForm.Text = "Announcement Generator 3.0"
 $mainForm.Width = 750
 $mainForm.Height = 600
 $mainForm.Font = $newFont
-$mainForm.Icon = New-Object System.Drawing.Icon($iconPath)
 $mainForm.AutoSize = $true
 
 $trackLabel = New-Object System.Windows.Forms.Label
