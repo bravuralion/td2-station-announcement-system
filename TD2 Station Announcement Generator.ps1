@@ -154,10 +154,11 @@ $timer.Add_Tick({
             $trainDropdown.Items.Clear()
             $trainDropdown.SelectedItem = $null
             if ($trainNumbers.Count -eq 0) {
-                $trainDropdown.Items.Add("Kein Zug aktuell in dieser Station")
+                $trainDropdown.Items.Add("No Trains in the Station")
             } else {
                 $trainDropdown.Items.AddRange($trainNumbers)
             }
+            AddToLog "Auto Update done"
         }
     }
 })
@@ -177,6 +178,7 @@ $updateButton.Add_Click({
         $trainDropdown.Items.Clear()
         $trainDropdown.SelectedItem = $null
         $trainDropdown.Items.AddRange($trainNumbers)
+        AddToLog "Updating Train List"
     }
 })
 $mainForm.Controls.Add($updateButton)
