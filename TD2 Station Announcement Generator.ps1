@@ -114,7 +114,6 @@ $languageSelection.Width = 250
 $languageSelection.Height = 150
 $mainForm.Controls.Add($languageSelection)
 
-# Gong File Selection
 $gongLabel = New-Object System.Windows.Forms.Label
 $gongLabel.Text = "Gong:"
 $gongLabel.Location = New-Object System.Drawing.Point(450, 220)
@@ -145,13 +144,11 @@ $logConsole.ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 $logConsole.ReadOnly = $true
 $mainForm.Controls.Add($logConsole)
 
-
 # Timer für Auto-Update
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 30000 # 30 Sekunden
 $timer.Add_Tick({
     if ($autoUpdateCheckbox.Checked) {
-        # Aktualisieren der Zugliste, wenn eine Station ausgewählt wurde
         if ($stationDropdown.SelectedItem) {
             $selectedStationName = $stationDropdown.SelectedItem
             $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
@@ -175,7 +172,6 @@ $updateButton.Width = 250
 $updateButton.Height = 60
 $updateButton.Add_Click({
 
-    # Aktualisieren der Zugliste, wenn eine Station ausgewählt wurde
     if ($stationDropdown.SelectedItem) {
         $selectedStationName = $stationDropdown.SelectedItem
         $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
@@ -240,13 +236,10 @@ $generateButton.Add_Click({
                 AddToLog "Generating announcement."
                 GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
                 
-     
-              
                 return
             }
             else {
-
-            
+        
                 $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
                 $announcementAEN = "Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
                 $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $($trackDropdown.SelectedItem), Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation fährt ein. Die planmässige Abfahrt ist um $($departureTime.ToString('HH:mm'))."
@@ -256,8 +249,6 @@ $generateButton.Add_Click({
                 AddToLog "Generating announcement."
                 GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
                 
-
-
                 return
 
             }
@@ -285,8 +276,6 @@ $generateButton.Add_Click({
         }
         AddToLog "Generating announcement."
         GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
-        
-
 
     } 
     else {
@@ -313,8 +302,6 @@ function ConvertTimeForAudio {
 
     return "$hours Uhr $minutes "
 }
-
-
 
 function Get-WavDuration {
     param (
@@ -397,14 +384,10 @@ function ConvertTextToSpeech {
 </speak>
 "@
 
-    # Konvertieren Sie den SSML-String in einen UTF-8 kodierten Byte-Array
     $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($bodyString)
-
-    # Anfrage senden und Antwort in eine Datei schreiben
     $response = Invoke-WebRequest -Uri $ttsUrl -Method Post -Headers $headers -Body $bodyBytes
     [System.IO.File]::WriteAllBytes($filename, $response.Content)
 
-    # Generierte Sprachausgabe abspielen
     $Song = New-Object System.Media.SoundPlayer
     $Song.SoundLocation = $filename
     $Song.Play()
@@ -455,10 +438,6 @@ function GenerateAndDisplayAnnouncement {
     [System.Windows.Forms.MessageBox]::Show("The following text has been copied to your clipboard:`n`n$combinedAnnouncement")
     AddToLog "Job complete"
 }
-
-
-
-
 
 $timer.Start()
 $mainForm.Controls.Add($generateButton)
