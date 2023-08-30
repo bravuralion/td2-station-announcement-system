@@ -1,8 +1,10 @@
 ﻿Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-$filename = "$env:APPDATA\test-file.wav"
-$apikey = ""
+$filename = "$env:APPDATA\TD2-AN.wav"
+$resourceRegion = "westeurope"
+$apiKey = ""
+$ttsUrl = "https://$resourceRegion.tts.speech.microsoft.com/cognitiveservices/v1"
 
 $fontFactor = 2
 $defaultFont = [System.Windows.Forms.Control]::DefaultFont
@@ -106,6 +108,7 @@ $mainForm.Controls.Add($languageSelectionLabel)
 $languageSelection = New-Object System.Windows.Forms.CheckedListBox
 $languageSelection.Items.Add("English", $true)
 $languageSelection.Items.Add("Polish", $true)
+$languageSelection.Items.Add("German", $true)
 $languageSelection.Location = New-Object System.Drawing.Point(450, 80)
 $languageSelection.Width = 250
 $languageSelection.Height = 150
@@ -132,6 +135,15 @@ $gongButton.Add_Click({
     }
 })
 $mainForm.Controls.Add($gongButton)
+
+$logConsole = New-Object System.Windows.Forms.TextBox
+$logConsole.Location = New-Object System.Drawing.Point(10, 510)
+$logConsole.Width = 690
+$logConsole.Height = 80
+$logConsole.Multiline = $true
+$logConsole.ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+$logConsole.ReadOnly = $true
+$mainForm.Controls.Add($logConsole)
 
 
 # Timer für Auto-Update
@@ -215,17 +227,20 @@ $generateButton.Add_Click({
 
             $arrivalTime = Get-Date "1970-01-01 00:00:00Z"
             $arrivalTime = $arrivalTime.AddSeconds($stopDetails.arrivalTimestamp / 1000).AddHours(1)
-
             
             if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 5) {
 
                 $delayMinutes = $stopDetails.departureDelay
                 $announcementEN = "*STATION ANNOUNCEMENT* The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $delayMinutes minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
                 $announcementAEN = "The $($categoriesNames[$selectedTrain.timetable.category]) from station $startStation to station $endStation, scheduled arrival $($arrivalTime.ToString('HH:mm')), will arrive approximately $delayMinutes minutes late at platform $($trackDropdown.SelectedItem). The delay is subject to change. Please pay attention to announcements."
+                $announcementDE = "*Bahnhofsdurchsage* Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation, geplante Ankunft $($arrivalTime.ToString('HH:mm')), wird voraussichtlich mit einer Verspätung von $delayMinutes Minuten auf Gleis $($trackDropdown.SelectedItem) eintreffen. Die Verspätung kann sich noch verändern. Bitte beachten Sie die Ansagen."
+                $announcementADE = "Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation, geplante Ankunft $($arrivalTime.ToString('HH:mm')), wird voraussichtlich mit einer Verspätung von $delayMinutes Minuten auf Gleis $($trackDropdown.SelectedItem) eintreffen. Die Verspätung kann sich noch verändern. Bitte beachten Sie die Ansagen."
                 $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
+                $announcementAPL = "Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), planowy przyjazd $($arrivalTime.ToString('HH:mm')), przyjedzie z opóźnieniem około $delayMinutes minut. Opóźnienie może ulec zmianie. Prosimy o zwracanie uwagi na komunikaty."
+                AddToLog "Generating announcement."
+                GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
                 
-                GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL
-                if ($audioCheckbox.Checked) {ConvertTextToSpeech -text $announcementAEN}        
+     
               
                 return
             }
@@ -234,10 +249,14 @@ $generateButton.Add_Click({
             
                 $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
                 $announcementAEN = "Attention at track $($trackDropdown.SelectedItem), The $($categoriesNames[$selectedTrain.timetable.category]) from $startStation to $endStation is arriving. The planned Departure is $($departureTime.ToString('HH:mm'))."
+                $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $($trackDropdown.SelectedItem), Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation fährt ein. Die planmässige Abfahrt ist um $($departureTime.ToString('HH:mm'))."
+                $announcementADE = "Achtung am Gleis $($trackDropdown.SelectedItem), Der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation nach $endStation fährt ein. Die planmässige Abfahrt ist um $($departureTime.ToString('HH:mm'))."
                 $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
+                $announcementAPL = "Uwaga! Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation do stacji $endStation wjedzie na tor $($trackDropdown.SelectedItem), Planowy odjazd pociągu o godzinie $($departureTime.ToString('HH:mm'))."
+                AddToLog "Generating announcement."
+                GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
+                
 
-                GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL
-                if ($audioCheckbox.Checked) {ConvertTextToSpeech -text $announcementAEN}
 
                 return
 
@@ -247,7 +266,10 @@ $generateButton.Add_Click({
            
             $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$selectedTrain.timetable.category]) from $startStation is arriving. This train ends here, please do not board the train."
             $announcementAEN = "Attention at track $($trackDropdown.SelectedItem), the $($categoriesNames[$selectedTrain.timetable.category]) from $startStation is arriving. This train ends here, please do not board the train."
+            $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $($trackDropdown.SelectedItem), der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation fährt ein. Dieser Zug endet hier, bitte nicht einsteigen."
+            $announcementADE = "Achtung am Gleis $($trackDropdown.SelectedItem), der $($categoriesNames[$selectedTrain.timetable.category]) von $startStation fährt ein. Dieser Zug endet hier, bitte nicht einsteigen."
             $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+            $announcementAPL = "Uwaga na tor $($trackDropdown.SelectedItem), przyjedzie Pociąg $($categoriesNames[$selectedTrain.timetable.category]) ze stacji $startStation. Pociąg kończy bieg. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
 
         }
         else {
@@ -255,16 +277,45 @@ $generateButton.Add_Click({
              $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $($trackDropdown.SelectedItem), A train is passing through. Please stand back."
              $announcementAEN = "Attention at track $($trackDropdown.SelectedItem), A train is passing through. Please stand back."
              $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Na tor $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+             $announcementAPL = "Uwaga! Na tor $($trackDropdown.SelectedItem) wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+             $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $($trackDropdown.SelectedItem), Zugdurchfahrt. Zurückbleiben bitte."
+             $announcementADE = "Achtung am Gleis $($trackDropdown.SelectedItem), Zugdurchfahrt. Zurückbleiben bitte."
+             
+                
         }
+        AddToLog "Generating announcement."
+        GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL -announcementDE $announcementDE
         
-        GenerateAndDisplayAnnouncement -announcementEN $announcementEN -announcementPL $announcementPL
-        if ($audioCheckbox.Checked) {ConvertTextToSpeech -text $announcementAEN}
+
+
     } 
     else {
         [System.Windows.Forms.MessageBox]::Show("Please select all: a station, track and train.")
     }
 
 })
+
+function AddToLog {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$message
+    )
+    $logConsole.AppendText("$(Get-Date -Format "HH:mm:ss"): $message`r`n")
+}
+
+function ConvertTimeForAudio {
+    param (
+        [DateTime]$time
+    )
+
+    $hours = $time.Hour
+    $minutes = $time.Minute
+
+    return "$hours Uhr $minutes "
+}
+
+
+
 function Get-WavDuration {
     param (
         [string]$wavPath
@@ -298,65 +349,115 @@ function Get-WavDuration {
     # Calculate the duration in seconds
     $durationInSeconds = $dataSize / ($sampleRate * $channels * $blockAlign / 8)
 
+    AddToLog "WAF Duration: $durationInSeconds"
     return $durationInSeconds
-}
-
-function GenerateAndDisplayAnnouncement {
-    param (
-        [string]$announcementEN,
-        [string]$announcementPL
-    )
-
-    $combinedAnnouncement = ""
-    if ($languageSelection.GetItemChecked(0)) { $combinedAnnouncement += "$announcementEN " }
-    if ($languageSelection.GetItemChecked(1)) { $combinedAnnouncement += "$announcementPL " }
-
-    $combinedAnnouncement | Set-Clipboard
-    [System.Windows.Forms.MessageBox]::Show("The following text has been copied to your clipboard:`n`n$combinedAnnouncement")
 }
 
 function ConvertTextToSpeech {
     param (
         [Parameter(Mandatory=$true)]
-        [string]$text
+        [string]$text,
+        [Parameter(Mandatory=$true)]
+        [string]$language
     )
-
+    AddToLog "Text for Audio: $text"
+    if ($language -eq "German" -and $text -match '(\d{2}:\d{2})') {
+        $text = $text -replace '(\d{2}:\d{2})', (ConvertTimeForAudio -time (Get-Date $matches[1]))
+        AddToLog "Text for German Audio after Time Update: $text"
+    }
+    # Header für die Anfrage
     $headers = @{
-        'content-type' = "application/json"
-        'x-rapidapi-host' = "large-text-to-speech.p.rapidapi.com"
-        'x-rapidapi-key' = $apikey
+        "Ocp-Apim-Subscription-Key" = $apiKey
+        "Content-Type" = "application/ssml+xml"
+        "X-Microsoft-OutputFormat" = "riff-16khz-16bit-mono-pcm"
+        "User-Agent" = "PowerShell"
     }
 
-    $body = @{
-        text = $text
-    } | ConvertTo-Json
-
-    $response = Invoke-RestMethod -Uri "https://large-text-to-speech.p.rapidapi.com/tts" -Method POST -Headers $headers -Body $body
-    $id = $response.id
-    $eta = $response.eta
-    Write-Host "Waiting $($eta) seconds for the job to finish..."
-    Start-Sleep -Seconds $eta
-
-    $response = Invoke-RestMethod -Uri "https://large-text-to-speech.p.rapidapi.com/tts?id=$id" -Method GET -Headers $headers
-
-    while (-not $response.url) {
-        $response = Invoke-RestMethod -Uri "https://large-text-to-speech.p.rapidapi.com/tts?id=$id" -Method GET -Headers $headers
-        Write-Host "Waiting some more..."
-        Start-Sleep -Seconds 3
+    # SSML-Body für die Anfrage basierend auf der gewählten Sprache
+    switch ($language) {
+        "English" {
+            $voiceName = "en-US-JessaNeural"
+            $lang = "en-US"
+        }
+        "Polish" {
+            $voiceName = "pl-PL-AgnieszkaNeural"
+            $lang = "pl-PL"
+        }
+        "German" {
+            $voiceName = "de-DE-KatjaNeural"
+            $lang = "de-DE"
+        }
     }
 
-    $url = $response.url
-    $responseBytes = Invoke-WebRequest -Uri $url -Headers $headers -Method GET -OutFile $filename
+    $bodyString = @"
+<speak version='1.0' xml:lang='$lang'>
+    <voice xml:lang='$lang' xml:gender='Female' name='$voiceName'>
+        $text
+    </voice>
+</speak>
+"@
 
-    Write-Host "File saved to $($filename) !"
+    # Konvertieren Sie den SSML-String in einen UTF-8 kodierten Byte-Array
+    $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($bodyString)
+
+    # Anfrage senden und Antwort in eine Datei schreiben
+    $response = Invoke-WebRequest -Uri $ttsUrl -Method Post -Headers $headers -Body $bodyBytes
+    [System.IO.File]::WriteAllBytes($filename, $response.Content)
+
+    # Generierte Sprachausgabe abspielen
     $Song = New-Object System.Media.SoundPlayer
-    $Song.SoundLocation = $gong
-    $Song.Play()
-    $timeout = Get-WavDuration -wavPath $gong
-    Start-Sleep -Seconds $timeout
     $Song.SoundLocation = $filename
     $Song.Play()
+    $timeout = Get-WavDuration -wavPath $filename
+    Start-Sleep -Seconds $timeout
 }
+
+function GenerateAndDisplayAnnouncement {
+    param (
+        [string]$announcementEN,
+        [string]$announcementPL,
+        [string]$announcementDE
+    )
+
+    $combinedAnnouncement = ""
+    $Song = New-Object System.Media.SoundPlayer
+    if ($script:gong -and $audioCheckbox.Checked) {
+        AddToLog "WAF selected, playing Gong."
+        $Song.SoundLocation = $gong
+        $Song.Play()
+        $timeout = Get-WavDuration -wavPath $gong
+        Start-Sleep -Seconds $timeout
+    }
+
+    if ($languageSelection.GetItemChecked(0)) { 
+        $combinedAnnouncement += "$announcementEN "
+        if ($audioCheckbox.Checked) {
+            AddToLog "Generating Audio announcement."
+            ConvertTextToSpeech -text $announcementAEN -language "English"
+        }
+    }
+    if ($languageSelection.GetItemChecked(1)) { 
+        $combinedAnnouncement += "$announcementPL "
+        if ($audioCheckbox.Checked) {
+            AddToLog "Generating Audio announcement."
+            ConvertTextToSpeech -text $announcementAPL -language "Polish"
+        }
+    }
+    if ($languageSelection.GetItemChecked(2)) {  # Überprüfen, ob "Deutsch" ausgewählt ist
+        $combinedAnnouncement += "$announcementDE "
+        if ($audioCheckbox.Checked) {
+            AddToLog "Generating Audio announcement."
+            ConvertTextToSpeech -text $announcementADE -language "German"
+        }
+    }
+
+    $combinedAnnouncement | Set-Clipboard
+    [System.Windows.Forms.MessageBox]::Show("The following text has been copied to your clipboard:`n`n$combinedAnnouncement")
+    AddToLog "Job complete"
+}
+
+
+
 
 
 $timer.Start()
