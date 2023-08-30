@@ -423,7 +423,7 @@ function GenerateAndDisplayAnnouncement {
             ConvertTextToSpeech -text $announcementAPL -language "Polish"
         }
     }
-    if ($languageSelection.GetItemChecked(2)) {  # Überprüfen, ob "Deutsch" ausgewählt ist
+    if ($languageSelection.GetItemChecked(2)) { 
         $combinedAnnouncement += "$announcementDE "
         if ($audioCheckbox.Checked) {
             AddToLog "Generating Audio announcement."
