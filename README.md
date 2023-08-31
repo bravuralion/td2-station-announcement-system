@@ -1,5 +1,5 @@
 
-![](https://i.imgur.com/diyYV3f.png)
+![](https://i.imgur.com/PvFw2AW.png)
 
 I have thought about how to make station announcements as a dispatcher in TD2 to make the experience of the train drivers a little more fun. I have built an AI voice generator for my streams with a gong that you can hear in the stream. I also wrote a small Powershell tool, which generates these announcements in text form, so that I can insert them into the chat of TD2.  
   
