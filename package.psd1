@@ -9,7 +9,7 @@
         FileVersion = '1.0.0'
         FileDescription = 'Announcement Tool for Train Driver 2'
         ProductName = 'TD2 Station Announcement Tool'
-        ProductVersion = '3.1.1'
+        ProductVersion = '3.2.2'
         Copyright = 'Bravura Lion'
         RequireElevation = $false
         ApplicationIconPath = 'c:\Users\bravura\Documents\GitHub\td2-simple-text-announcement-generator\logo.ico'

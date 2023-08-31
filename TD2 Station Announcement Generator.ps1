@@ -6,7 +6,7 @@ Description:	This Tool creates Announcements based on the timetable of a train f
 Author:			Sebastian Kurz / Bravura Lion
 Created:		08/2023
 Last Updated:	31/08/2023
-Version:     	3.1.2
+Version:     	3.2.2
 Notes:			Alpha Version, Source does not include Azure Voice API Key which is required for Audio Output.
 
 ========================================================================================================================= #>
