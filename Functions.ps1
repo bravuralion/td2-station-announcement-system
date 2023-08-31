@@ -9,6 +9,13 @@ Version:     	0.1
 Notes:			Alpha Version, Source does not include Azure Voice API Key which is required for Audio Output.
 
 ========================================================================================================================= #>
+#File Location für Audio Announcement
+$filename = "$env:APPDATA\TD2-AN.wav"
+
+#Settings for Azure Voice
+$resourceRegion = "westeurope"
+$apiKey = ""
+$ttsUrl = "https://$resourceRegion.tts.speech.microsoft.com/cognitiveservices/v1"
 
 function ConvertTimeForAudio {
     param (
@@ -117,7 +124,10 @@ function GenerateAndDisplayAnnouncement {
     param (
         [string]$announcementEN,
         [string]$announcementPL,
-        [string]$announcementDE
+        [string]$announcementDE,
+        [string]$announcementAEN,
+        [string]$announcementAPL,
+        [string]$announcementADE
     )
 
     $combinedAnnouncement = ""
@@ -163,3 +173,4 @@ function AddToLog {
     )
     $logConsole.AppendText("$(Get-Date -Format "HH:mm:ss"): $message`r`n")
 }
+Export-ModuleMember -Variable 'announcementADE'
