@@ -6,7 +6,7 @@ Description:	This Tool creates Announcements based on the timetable of a train f
 Author:			Sebastian Kurz / Bravura Lion
 Created:		08/2023
 Last Updated:	31/08/2023
-Version:     	3.2.2
+Version:     	3.2.4
 Notes:			Alpha Version, Source does not include Azure Voice API Key which is required for Audio Output.
 
 ========================================================================================================================= #>
@@ -15,8 +15,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 #Import of custom Functions
-.. \functions.ps1
-
+. .\Functions.ps1
 
 
 #GUI Scaling
@@ -147,7 +146,7 @@ $mainForm.Controls.Add($gongButton)
 $logConsole = New-Object System.Windows.Forms.TextBox
 $logConsole.Location = New-Object System.Drawing.Point(10, 510)
 $logConsole.Width = 690
-$logConsole.Height = 80
+$logConsole.Height = 110
 $logConsole.Multiline = $true
 $logConsole.ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 $logConsole.ReadOnly = $true
@@ -202,8 +201,8 @@ $generateButton.Add_Click({
         #write-host "Stop Type:"
         #write-host $stopDetails.stopType
 
-        $startStation = $selectedTrain.timetable.stopList[0].stopNameRAW
-        $endStation = $selectedTrain.timetable.stopList[-1].stopNameRAW
+        $startStation = ConvertToProperCase($selectedTrain.timetable.stopList[0].stopNameRAW)
+        $endStation = ConvertToProperCase($selectedTrain.timetable.stopList[-1].stopNameRAW)
 
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
 
@@ -272,10 +271,13 @@ $generateButton.Add_Click({
     }
 
 })
+$mainForm.Controls.Add($generateButton)
+
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 30000 # 30 Sekunden
 $timer.Add_Tick({
     if ($autoUpdateCheckbox.Checked) {
+        AddToLog "Auto Update start"
         if ($stationDropdown.SelectedItem) {
             $selectedStationName = $stationDropdown.SelectedItem
             $trainsResponse = Invoke-RestMethod -Uri "https://spythere.pl/api/getActiveTrainList"
@@ -288,11 +290,14 @@ $timer.Add_Tick({
             } else {
                 $trainDropdown.Items.AddRange($trainNumbers)
             }
-            AddToLog "Auto Update done"
+            AddToLog "Auto Update finished"
         }
     }
 })
-
 $timer.Start()
-$mainForm.Controls.Add($generateButton)
 $mainForm.ShowDialog()
+
+
+
+#For Visual Studio Debugging
+#$timer.Dispose()

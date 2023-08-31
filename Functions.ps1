@@ -5,7 +5,7 @@ Description:	Function Lib for the Announcement Tool
 Author:			Sebastian Kurz / Bravura Lion
 Created:		08/2023
 Last Updated:	31/08/2023
-Version:     	0.2
+Version:     	0.3
 Notes:			Alpha Version, Source does not include Azure Voice API Key which is required for Audio Output.
 
 ========================================================================================================================= #>
@@ -134,10 +134,18 @@ function GenerateAndDisplayAnnouncement {
     $Song = New-Object System.Media.SoundPlayer
     if ($script:gong -and $audioCheckbox.Checked) {
         AddToLog "WAF selected, playing Gong."
-        $Song.SoundLocation = $gong
-        $Song.Play()
         $timeout = Get-WavDuration -wavPath $gong
-        Start-Sleep -Seconds $timeout
+        if ($timeout -lt 10)
+        {
+            $Song.SoundLocation = $gong
+            $Song.Play()
+            Start-Sleep -Seconds $timeout
+        }
+        else {
+            AddToLog "Gong File too Long: $timeout Select a File which is less than 10 Seconds long."
+        }
+
+
     }
 
     if ($languageSelection.GetItemChecked(0)) { 
@@ -173,4 +181,9 @@ function AddToLog {
     )
     $logConsole.AppendText("$(Get-Date -Format "HH:mm:ss"): $message`r`n")
 }
-Export-ModuleMember -Variable 'announcementADE'
+function ConvertToProperCase($inputString) {
+    AddToLog "Convert String: $inputString"
+    $firstLetter = $inputString.Substring(0, 1).ToUpper()
+    $remainingLetters = $inputString.Substring(1).ToLower()
+    return $firstLetter + $remainingLetters
+}
