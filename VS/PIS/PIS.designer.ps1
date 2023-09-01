@@ -157,7 +157,7 @@ $languageSelectionLabel.Text = [System.String]'Language for Announcements'
 #languageSelection
 #
 $languageSelection.FormattingEnabled = $true
-$languageSelection.Items.AddRange([System.Object[]]@([System.String]'English',[System.String]'German',[System.String]'Polish'))
+$languageSelection.Items.AddRange([System.Object[]]@([System.String]'English',[System.String]'Polish',[System.String]'German'))
 $languageSelection.Location = (New-Object -TypeName System.Drawing.Point -ArgumentList @([System.Int32]192,[System.Int32]29))
 $languageSelection.Name = [System.String]'languageSelection'
 $languageSelection.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([System.Int32]147,[System.Int32]49))
@@ -303,12 +303,15 @@ $generateButton.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @
 $generateButton.TabIndex = [System.Int32]13
 $generateButton.Text = [System.String]'Generate Announcement'
 $generateButton.UseVisualStyleBackColor = $true
+$generateButton.add_Click($generateButton_Click)
 #
 #logConsole
 #
 $logConsole.Location = (New-Object -TypeName System.Drawing.Point -ArgumentList @([System.Int32]12,[System.Int32]166))
 $logConsole.Multiline = $true
 $logConsole.Name = [System.String]'logConsole'
+$logConsole.ReadOnly = $true
+$logConsole.ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 $logConsole.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([System.Int32]363,[System.Int32]79))
 $logConsole.TabIndex = [System.Int32]14
 #
@@ -320,6 +323,7 @@ $updateButton.Size = (New-Object -TypeName System.Drawing.Size -ArgumentList @([
 $updateButton.TabIndex = [System.Int32]15
 $updateButton.Text = [System.String]'Update Trains'
 $updateButton.UseVisualStyleBackColor = $true
+$updateButton.add_Click($updateButton_Click)
 #
 #PIS
 #
