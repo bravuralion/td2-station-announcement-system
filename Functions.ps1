@@ -1,4 +1,4 @@
-<# ========================================================================================================================
+﻿<# ========================================================================================================================
 
 Description:	Function Lib for the Announcement Tool
 
@@ -186,4 +186,60 @@ function ConvertToProperCase($inputString) {
     $firstLetter = $inputString.Substring(0, 1).ToUpper()
     $remainingLetters = $inputString.Substring(1).ToLower()
     return $firstLetter + $remainingLetters
+}
+function GeneratePassing {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$track
+    )
+    $combinedAnnouncement = ""
+    $Song = New-Object System.Media.SoundPlayer
+    if ($script:gong -and $audioCheckbox.Checked) {
+        AddToLog "WAF selected, playing Gong."
+        $timeout = Get-WavDuration -wavPath $gong
+        if ($timeout -lt 10)
+        {
+            $Song.SoundLocation = $gong
+            $Song.Play()
+            Start-Sleep -Seconds $timeout
+        }
+        else {
+            AddToLog "Gong File too Long: $timeout Select a File which is less than 10 Seconds long."
+        }
+
+
+    }
+    $announcementEN = "*STATION ANNOUNCEMENT* Attention at track $track, A train is passing through. Please stand back."
+    $announcementAEN = "Attention at track $track, A train is passing through. Please stand back."
+    $announcementPL = "*OGŁOSZENIE STACYJNE* Uwaga! Na tor numer $track wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+    $announcementAPL = "Uwaga! Na tor numer $track wjedzie pociąg bez zatrzymania. Prosimy zachować ostrożność i nie zbliżać się do krawędzi peronu."
+    $announcementDE = "*Bahnhofsdurchsage* Achtung am Gleis $track, Zugdurchfahrt. Zurückbleiben bitte."
+    $announcementADE = "Achtung am Gleis $track, Zugdurchfahrt. Zurückbleiben bitte."
+    if ($languageSelection.GetItemChecked(0)) { 
+        $combinedAnnouncement += "$announcementEN "
+        if ($audioCheckbox.Checked) {
+            AddToLog "Generating Audio announcement."
+            ConvertTextToSpeech -text $announcementAEN -language "English"
+        }
+    }
+    if ($languageSelection.GetItemChecked(1)) { 
+        $combinedAnnouncement += "$announcementPL "
+        if ($audioCheckbox.Checked) {
+            AddToLog "Generating Audio announcement."
+            ConvertTextToSpeech -text $announcementAPL -language "Polish"
+        }
+    }
+    if ($languageSelection.GetItemChecked(2)) { 
+        $combinedAnnouncement += "$announcementDE "
+        if ($audioCheckbox.Checked) {
+            AddToLog "Generating Audio announcement."
+            ConvertTextToSpeech -text $announcementADE -language "German"
+        }
+    }
+    $combinedAnnouncement | Set-Clipboard
+    [System.Windows.Forms.MessageBox]::Show("The following text has been copied to your clipboard:`n`n$combinedAnnouncement")
+    AddToLog "Job complete"
+
+
+
 }

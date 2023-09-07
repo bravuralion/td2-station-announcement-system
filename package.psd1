@@ -1,20 +1,20 @@
 @{
-    Root = 'c:\Users\bravura\Documents\GitHub\td2-simple-text-announcement-generator\TD2 Station Announcement Generator.ps1'
-    OutputPath = 'c:\Users\bravura\Documents\GitHub\td2-simple-text-announcement-generator\out'
+    Root = 'C:\Users\bravura\Documents\GitHub\td2-simple-text-announcement-generator\PIS.ps1'
+    OutputPath = 'C:\Users\bravura\Documents\GitHub\td2-simple-text-announcement-generator\out'
     Package = @{
         Enabled = $true
-        Obfuscate = $false
+        Obfuscate = $true
         HideConsoleWindow = $true
         DotNetVersion = 'v4.6.2'
         FileVersion = '1.0.0'
-        FileDescription = 'Announcement Tool for Train Driver 2'
-        ProductName = 'TD2 Station Announcement Tool'
-        ProductVersion = '3.2.2'
-        Copyright = 'Bravura Lion'
+        FileDescription = ''
+        ProductName = ''
+        ProductVersion = ''
+        Copyright = ''
         RequireElevation = $false
-        ApplicationIconPath = 'c:\Users\bravura\Documents\GitHub\td2-simple-text-announcement-generator\logo.ico'
+        ApplicationIconPath = ''
         PackageType = 'Console'
-        HighDPISupport = $true
+        Resources = [string[]]@()
     }
     Bundle = @{
         Enabled = $true
