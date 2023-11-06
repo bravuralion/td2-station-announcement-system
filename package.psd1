@@ -6,7 +6,7 @@
         Obfuscate = $true
         HideConsoleWindow = $true
         DotNetVersion = 'v4.6.2'
-        FileVersion = '1.0.0'
+        FileVersion = '1.0.1'
         FileDescription = ''
         ProductName = ''
         ProductVersion = ''

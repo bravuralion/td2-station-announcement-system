@@ -67,10 +67,10 @@ $generateButton_Click = {
         if ($stopDetails.stopType -like "*ph*" -and $stopDetails.terminatesHere -eq $false) {
 
             $departureTime = Get-Date "1970-01-01 00:00:00Z"
-            $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(1)
+            $departureTime = $departureTime.AddSeconds($stopDetails.departureTimestamp / 1000).AddHours(0)
 
             $arrivalTime = Get-Date "1970-01-01 00:00:00Z"
-            $arrivalTime = $arrivalTime.AddSeconds($stopDetails.arrivalTimestamp / 1000).AddHours(1)
+            $arrivalTime = $arrivalTime.AddSeconds($stopDetails.arrivalTimestamp / 1000).AddHours(0)
             
             if ($delayCheckbox.Checked -and $stopDetails.departureDelay -gt 5) {
 
